@@ -1,0 +1,87 @@
+name: OriginalLightLib
+version: '1.0.0'
+main: ol.originallightlib.OriginalLightLib
+api-version: '1.21'
+author: OriginalLight
+
+commands:
+  oll:
+    description: OriginalLightLib main command
+    usage: /oll
+    permission: originallightlib.command
+
+permissions:
+  originallightlib.command:
+    default: op
+
+  originallightlib.command.help:
+    default: op
+
+  originallightlib.testgui:
+    default: op
+
+  originallightlib.testconfig:
+    default: op
+
+  originallightlib.reload:
+    default: op
+
+  originallightlib.testitem:
+    default: op
+
+  originallightlib.saveitem:
+    default: op
+
+  originallightlib.getitem:
+    default: op
+
+  originallightlib.itemgui:
+    default: op
+
+  originallightlib.removeitem:
+    default: op
+
+  originallightlib.confirm:
+    default: op
+
+  originallightlib.chatinput:
+    default: op
+
+  originallightlib.pagegui:
+    default: op
+
+  originallightlib.selectiontool:
+    default: op
+
+  originallightlib.selectioninfo:
+    default: op
+
+  originallightlib.selectionclear:
+    default: op
+
+  originallightlib.selectionsave:
+    default: op
+
+  originallightlib.selectionload:
+    default: op
+
+  originallightlib.cooldown:
+    default: op
+
+  originallightlib.actionbar:
+    default: op
+
+  originallightlib.inputtest:
+    default: op
+
+  originallightlib.bossbar:
+    default: op
+
+  originallightlib.sound:
+    default: op
+
+  originallightlib.title:
+    default: op
+
+  originallightlib.time:
+    default: op
