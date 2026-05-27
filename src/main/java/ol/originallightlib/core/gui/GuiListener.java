@@ -48,7 +48,15 @@ public class GuiListener implements Listener {
 
         Bukkit.getScheduler().runTask(plugin, () -> GuiItemMarker.clearGuiItemsFromPlayer(player));
 
-        if (rawSlot < 0 || rawSlot >= topSize) {
+        if (rawSlot < 0) {
+            return;
+        }
+
+        if (rawSlot >= topSize) {
+            if (gui.allowsPlayerInventoryInteraction() && gui.isPlayerInventoryClickAllowed(event)) {
+                event.setCancelled(false);
+                event.setResult(Event.Result.DEFAULT);
+            }
             return;
         }
 

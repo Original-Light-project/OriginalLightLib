@@ -62,6 +62,14 @@ public abstract class Gui {
         return true;
     }
 
+    public boolean allowsPlayerInventoryInteraction() {
+        return false;
+    }
+
+    public boolean isPlayerInventoryClickAllowed(InventoryClickEvent event) {
+        return true;
+    }
+
     public void onEditableClick(InventoryClickEvent event) {
     }
 
