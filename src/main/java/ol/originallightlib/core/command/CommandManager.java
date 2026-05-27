@@ -21,6 +21,14 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         subCommands.put(subCommand.name().toLowerCase(), subCommand);
     }
 
+    public void unregister(String name) {
+        if (name == null) {
+            return;
+        }
+
+        subCommands.remove(name.toLowerCase());
+    }
+
     public Collection<SubCommand> getSubCommands() {
         return subCommands.values();
     }
