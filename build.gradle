@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly(files("../MythicMobs-5.12.1.jar"))
 }
 
 tasks {

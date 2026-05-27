@@ -9,6 +9,7 @@ import ol.originallightlib.core.item.ItemRegistry;
 import ol.originallightlib.core.message.MessageManager;
 import ol.originallightlib.core.region.SelectionListener;
 import ol.originallightlib.core.region.SelectionManager;
+import ol.originallightlib.integration.IntegrationManager;
 import ol.originallightlib.test.HelpSubCommand;
 import ol.originallightlib.test.ReloadSubCommand;
 import ol.originallightlib.test.TestCommandRegistrar;
@@ -26,6 +27,7 @@ public final class OriginalLightLib extends JavaPlugin {
     private SelectionManager selectionManager;
     private CooldownManager cooldownManager;
     private DebugSettings debugSettings;
+    private IntegrationManager integrationManager;
 
     @Override
     public void onEnable() {
@@ -44,6 +46,7 @@ public final class OriginalLightLib extends JavaPlugin {
         this.messageManager = new MessageManager(this);
         this.itemRegistry = new ItemRegistry(this);
         this.cooldownManager = new CooldownManager();
+        this.integrationManager = new IntegrationManager(this);
 
         this.selectionManager = new SelectionManager();
         getServer().getPluginManager().registerEvents(
@@ -52,12 +55,9 @@ public final class OriginalLightLib extends JavaPlugin {
         );
 
         this.commandManager = new CommandManager();
-
-        // 正式環境也保留的基本指令
         this.commandManager.register(new HelpSubCommand(commandManager));
         this.commandManager.register(new ReloadSubCommand());
 
-        // 開發 / 測試指令只在 debug 模式下註冊
         if (debugSettings.isTestCommandsEnabled()) {
             TestCommandRegistrar.register(commandManager);
             debugSettings.log("Test commands registered.");
@@ -70,12 +70,14 @@ public final class OriginalLightLib extends JavaPlugin {
             getCommand("oll").setTabCompleter(commandManager);
         }
 
-        getLogger().info("OriginalLightLib 已啟用。");
+        this.integrationManager.load();
+
+        getLogger().info("OriginalLightLib enabled.");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("OriginalLightLib 已停用。");
+        getLogger().info("OriginalLightLib disabled.");
     }
 
     public static OriginalLightLib getInstance() {
@@ -112,5 +114,9 @@ public final class OriginalLightLib extends JavaPlugin {
 
     public DebugSettings getDebugSettings() {
         return debugSettings;
+    }
+
+    public IntegrationManager getIntegrationManager() {
+        return integrationManager;
     }
 }

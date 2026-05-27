@@ -3,6 +3,9 @@ version: '1.0.0'
 main: ol.originallightlib.OriginalLightLib
 api-version: '1.21'
 author: OriginalLight
+softdepend:
+  - ExcellentEconomy
+  - MythicMobs
 
 commands:
   oll:

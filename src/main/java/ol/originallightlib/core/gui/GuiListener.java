@@ -2,6 +2,7 @@ package ol.originallightlib.core.gui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,20 +37,10 @@ public class GuiListener implements Listener {
         Gui gui = holder.getGui();
 
         event.setCancelled(true);
-        event.setResult(org.bukkit.event.Event.Result.DENY);
+        event.setResult(Event.Result.DENY);
 
         int rawSlot = event.getRawSlot();
         int topSize = event.getView().getTopInventory().getSize();
-
-        /*
-         * 不要清除 event.getCurrentItem()
-         *
-         * 因為玩家點擊 GUI 上方區域時，
-         * currentItem 本來就是 GUI icon。
-         *
-         * 如果這裡 setCurrentItem(null)，
-         * GUI 內的按鈕圖示就會被清掉。
-         */
 
         if (GuiItemMarker.isGuiItem(event.getCursor())) {
             event.setCursor(null);
@@ -61,11 +52,21 @@ public class GuiListener implements Listener {
             return;
         }
 
-        if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
+        GuiButton button = gui.getButton(rawSlot);
+
+        if (button == null && gui.isEditableSlot(rawSlot)) {
+            if (!gui.isEditableClickAllowed(event)) {
+                return;
+            }
+            event.setCancelled(false);
+            event.setResult(Event.Result.DEFAULT);
+            gui.onEditableClick(event);
             return;
         }
 
-        GuiButton button = gui.getButton(rawSlot);
+        if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
+            return;
+        }
 
         if (button == null) {
             return;
@@ -85,7 +86,7 @@ public class GuiListener implements Listener {
         }
 
         event.setCancelled(true);
-        event.setResult(org.bukkit.event.Event.Result.DENY);
+        event.setResult(Event.Result.DENY);
 
         Bukkit.getScheduler().runTask(plugin, () -> GuiItemMarker.clearGuiItemsFromPlayer(player));
     }
@@ -96,20 +97,33 @@ public class GuiListener implements Listener {
             return;
         }
 
-        if (!(event.getView().getTopInventory().getHolder() instanceof GuiHolder)) {
+        if (!(event.getView().getTopInventory().getHolder() instanceof GuiHolder holder)) {
             return;
         }
 
+        Gui gui = holder.getGui();
         int topSize = event.getView().getTopInventory().getSize();
+        boolean touchesTop = false;
 
         for (int rawSlot : event.getRawSlots()) {
-            if (rawSlot < topSize) {
+            if (rawSlot >= topSize) {
+                continue;
+            }
+
+            touchesTop = true;
+            if (!gui.isEditableSlot(rawSlot)) {
                 event.setCancelled(true);
-                event.setResult(org.bukkit.event.Event.Result.DENY);
+                event.setResult(Event.Result.DENY);
 
                 Bukkit.getScheduler().runTask(plugin, () -> GuiItemMarker.clearGuiItemsFromPlayer(player));
                 return;
             }
+        }
+
+        if (touchesTop) {
+            event.setCancelled(false);
+            event.setResult(Event.Result.DEFAULT);
+            gui.onEditableDrag(event);
         }
     }
 

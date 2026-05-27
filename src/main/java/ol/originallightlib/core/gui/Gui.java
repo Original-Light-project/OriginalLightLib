@@ -3,6 +3,8 @@ package ol.originallightlib.core.gui;
 import ol.originallightlib.OriginalLightLib;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
@@ -52,7 +54,20 @@ public abstract class Gui {
         return inventory;
     }
 
+    public boolean isEditableSlot(int slot) {
+        return false;
+    }
+
+    public boolean isEditableClickAllowed(InventoryClickEvent event) {
+        return true;
+    }
+
+    public void onEditableClick(InventoryClickEvent event) {
+    }
+
+    public void onEditableDrag(InventoryDragEvent event) {
+    }
+
     public void onClose(Player player) {
-        // 預設不做事，需要時讓子類別覆寫
     }
 }
