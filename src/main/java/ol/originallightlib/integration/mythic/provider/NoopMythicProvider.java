@@ -30,6 +30,11 @@ public class NoopMythicProvider implements MythicProvider {
     }
 
     @Override
+    public Optional<String> resolveMobId(Entity entity) {
+        return Optional.empty();
+    }
+
+    @Override
     public MythicResult spawnMob(String mobId, Location location, int amount, double level) {
         return MythicResult.failure(UNAVAILABLE);
     }

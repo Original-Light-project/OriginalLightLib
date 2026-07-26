@@ -29,6 +29,10 @@ public class MythicService {
         return provider.hasMob(mobId);
     }
 
+    public Optional<String> resolveMobId(Entity entity) {
+        return entity == null ? Optional.empty() : provider.resolveMobId(entity);
+    }
+
     public MythicResult spawnMob(String mobId, Location location, int amount) {
         return provider.spawnMob(mobId, location, amount, 1D);
     }

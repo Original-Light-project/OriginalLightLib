@@ -11,24 +11,47 @@ import java.util.List;
 
 public abstract class PaginatedGui<T> extends Gui {
 
+    public record Text(
+            String previous,
+            String next,
+            String pageInfo,
+            String totalItems,
+            String perPage,
+            String empty,
+            String emptyLore,
+            String switchPrevious,
+            String switchNext
+    ) {
+        public static Text defaults() {
+            return new Text(
+                    "&e上一頁", "&e下一頁", "&f第 &e%page% &f/ &e%pages% &f頁",
+                    "&7總項目數：&e%total%", "&7每頁項目：&e%per_page%",
+                    "&c沒有可顯示的資料", "&7目前列表是空的。",
+                    "&e點擊切換到上一頁", "&e點擊切換到下一頁"
+            );
+        }
+    }
+
     private final List<T> items;
     private final int[] contentSlots;
+    private final Text text;
 
     private int page;
 
     public PaginatedGui(String title, int size, List<T> items) {
-        super(title, size);
-
-        this.items = items == null ? List.of() : new ArrayList<>(items);
-        this.contentSlots = defaultContentSlots(size);
-        this.page = 0;
+        this(title, size, items, null, Text.defaults());
     }
 
     public PaginatedGui(String title, int size, List<T> items, int[] contentSlots) {
+        this(title, size, items, contentSlots, Text.defaults());
+    }
+
+    public PaginatedGui(String title, int size, List<T> items, int[] contentSlots, Text text) {
         super(title, size);
 
         this.items = items == null ? List.of() : new ArrayList<>(items);
-        this.contentSlots = contentSlots;
+        this.contentSlots = contentSlots == null ? defaultContentSlots(size) : contentSlots.clone();
+        this.text = text == null ? Text.defaults() : text;
         this.page = 0;
     }
 
@@ -70,11 +93,11 @@ public abstract class PaginatedGui<T> extends Gui {
         if (hasPreviousPage()) {
             setButton(45, new GuiButton(
                     ItemBuilder.of(Material.ARROW)
-                            .name("&e上一頁")
+                            .name(text.previous())
                             .lore(
-                                    "&7目前頁數：&f" + getDisplayPage() + "&7/&f" + getTotalPages(),
+                                    replace(text.pageInfo()),
                                     "",
-                                    "&e點擊切換到上一頁"
+                                    text.switchPrevious()
                             )
                             .build(),
                     event -> {
@@ -85,7 +108,7 @@ public abstract class PaginatedGui<T> extends Gui {
         } else {
             setButton(45, new GuiButton(
                     ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                            .name("&8上一頁")
+                            .name(text.previous())
                             .build(),
                     event -> {
                     }
@@ -95,11 +118,11 @@ public abstract class PaginatedGui<T> extends Gui {
         if (hasNextPage()) {
             setButton(53, new GuiButton(
                     ItemBuilder.of(Material.ARROW)
-                            .name("&e下一頁")
+                            .name(text.next())
                             .lore(
-                                    "&7目前頁數：&f" + getDisplayPage() + "&7/&f" + getTotalPages(),
+                                    replace(text.pageInfo()),
                                     "",
-                                    "&e點擊切換到下一頁"
+                                    text.switchNext()
                             )
                             .build(),
                     event -> {
@@ -110,7 +133,7 @@ public abstract class PaginatedGui<T> extends Gui {
         } else {
             setButton(53, new GuiButton(
                     ItemBuilder.of(Material.GRAY_STAINED_GLASS_PANE)
-                            .name("&8下一頁")
+                            .name(text.next())
                             .build(),
                     event -> {
                     }
@@ -121,10 +144,10 @@ public abstract class PaginatedGui<T> extends Gui {
     private void drawPageInfo() {
         setButton(49, new GuiButton(
                 ItemBuilder.of(Material.PAPER)
-                        .name("&f第 &e" + getDisplayPage() + " &f/ &e" + getTotalPages() + " &f頁")
+                        .name(replace(text.pageInfo()))
                         .lore(
-                                "&7總項目數：&e" + items.size(),
-                                "&7每頁項目：&e" + contentSlots.length
+                                replace(text.totalItems()),
+                                replace(text.perPage())
                         )
                         .build(),
                 event -> {
@@ -135,8 +158,8 @@ public abstract class PaginatedGui<T> extends Gui {
     protected void drawEmpty(Player player) {
         setButton(22, new GuiButton(
                 ItemBuilder.of(Material.BARRIER)
-                        .name("&c沒有可顯示的資料")
-                        .lore("&7目前列表是空的。")
+                        .name(text.empty())
+                        .lore(text.emptyLore())
                         .build(),
                 event -> {
                 }
@@ -186,7 +209,19 @@ public abstract class PaginatedGui<T> extends Gui {
     }
 
     public int[] getContentSlots() {
-        return contentSlots;
+        return contentSlots.clone();
+    }
+
+    protected void setPage(int page) {
+        this.page = Math.max(0, Math.min(page, getTotalPages() - 1));
+    }
+
+    private String replace(String value) {
+        return value
+                .replace("%page%", Integer.toString(getDisplayPage()))
+                .replace("%pages%", Integer.toString(getTotalPages()))
+                .replace("%total%", Integer.toString(items.size()))
+                .replace("%per_page%", Integer.toString(contentSlots.length));
     }
 
     private int[] defaultContentSlots(int size) {

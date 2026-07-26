@@ -39,12 +39,16 @@ public class ChatInputListener implements Listener {
             chatInputManager.removeSession(player);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage("§c輸入已逾時，請重新操作。");
+                if (!session.getTimeoutMessage().isBlank()) {
+                    player.sendMessage(session.getTimeoutMessage());
+                }
             });
             return;
         }
 
-        if (message.equalsIgnoreCase("cancel") || message.equalsIgnoreCase("取消")) {
+        if (message.equalsIgnoreCase(session.getCancelToken())
+                || (session.getCancelToken().equalsIgnoreCase("cancel")
+                && message.equalsIgnoreCase("取消"))) {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 chatInputManager.cancel(player);
             });

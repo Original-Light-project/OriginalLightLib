@@ -4,8 +4,12 @@ import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class Text {
+
+    private static final Pattern HEX_COLOR = Pattern.compile("(?i)&#([0-9a-f]{6})");
 
     private Text() {
     }
@@ -15,7 +19,18 @@ public final class Text {
             return "";
         }
 
-        return ChatColor.translateAlternateColorCodes('&', text);
+        Matcher matcher = HEX_COLOR.matcher(text);
+        StringBuffer converted = new StringBuffer();
+        while (matcher.find()) {
+            String hex = matcher.group(1);
+            StringBuilder legacy = new StringBuilder("§x");
+            for (char character : hex.toCharArray()) {
+                legacy.append('§').append(character);
+            }
+            matcher.appendReplacement(converted, Matcher.quoteReplacement(legacy.toString()));
+        }
+        matcher.appendTail(converted);
+        return ChatColor.translateAlternateColorCodes('&', converted.toString());
     }
 
     public static List<String> color(List<String> lines) {

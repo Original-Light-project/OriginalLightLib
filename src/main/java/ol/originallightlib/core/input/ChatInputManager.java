@@ -37,13 +37,31 @@ public class ChatInputManager {
             Consumer<Player> cancelAction,
             int timeoutSeconds
     ) {
+        awaitInput(
+                player, prompt, inputAction, cancelAction, timeoutSeconds,
+                "cancel", "§7輸入 §ccancel §7可取消。", "§c輸入已逾時，請重新操作。"
+        );
+    }
+
+    public void awaitInput(
+            Player player,
+            String prompt,
+            BiConsumer<Player, String> inputAction,
+            Consumer<Player> cancelAction,
+            int timeoutSeconds,
+            String cancelToken,
+            String cancelHint,
+            String timeoutMessage
+    ) {
         long expireAtMillis = System.currentTimeMillis() + timeoutSeconds * 1000L;
 
         ChatInputSession session = new ChatInputSession(
                 prompt,
                 inputAction,
                 cancelAction,
-                expireAtMillis
+                expireAtMillis,
+                cancelToken,
+                timeoutMessage
         );
 
         sessions.put(player.getUniqueId(), session);
@@ -52,7 +70,9 @@ public class ChatInputManager {
             player.sendMessage(prompt);
         }
 
-        player.sendMessage("§7輸入 §ccancel §7可取消。");
+        if (cancelHint != null && !cancelHint.isBlank()) {
+            player.sendMessage(cancelHint);
+        }
     }
 
     public boolean hasSession(Player player) {

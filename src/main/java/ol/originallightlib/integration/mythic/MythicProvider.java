@@ -16,6 +16,8 @@ public interface MythicProvider {
 
     boolean hasMob(String mobId);
 
+    Optional<String> resolveMobId(Entity entity);
+
     MythicResult spawnMob(String mobId, Location location, int amount, double level);
 
     boolean hasItem(String itemId);

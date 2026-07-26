@@ -14,14 +14,28 @@ import java.util.function.BiConsumer;
 
 public class ItemSelectGui extends PaginatedGui<String> {
 
+    public record Text(String title, String emptyName, List<String> emptyLore, String emptyMessage) {
+        public static Text defaults() {
+            return new Text("§8選擇紀錄物品", "&c沒有已紀錄的物品",
+                    List.of("&7目前沒有任何可選擇的紀錄物品。", "", "&7請先使用對應指令紀錄物品。"),
+                    "§c目前沒有任何已紀錄物品。");
+        }
+    }
+
     private final ItemRegistry itemRegistry;
     private final BiConsumer<Player, String> selectAction;
+    private final Text text;
 
     public ItemSelectGui(ItemRegistry itemRegistry, BiConsumer<Player, String> selectAction) {
-        super("§8選擇紀錄物品", 54, getSortedItemIds(itemRegistry));
+        this(itemRegistry, selectAction, Text.defaults());
+    }
+
+    public ItemSelectGui(ItemRegistry itemRegistry, BiConsumer<Player, String> selectAction, Text text) {
+        super((text == null ? Text.defaults() : text).title(), 54, getSortedItemIds(itemRegistry));
 
         this.itemRegistry = itemRegistry;
         this.selectAction = selectAction;
+        this.text = text == null ? Text.defaults() : text;
     }
 
     @Override
@@ -47,14 +61,10 @@ public class ItemSelectGui extends PaginatedGui<String> {
     protected void drawEmpty(Player player) {
         setButton(22, new GuiButton(
                 ItemBuilder.of(Material.BARRIER)
-                        .name("&c沒有已紀錄的物品")
-                        .lore(
-                                "&7目前沒有任何可選擇的紀錄物品。",
-                                "",
-                                "&7請先使用對應指令紀錄物品。"
-                        )
+                        .name(text.emptyName())
+                        .lore(text.emptyLore())
                         .build(),
-                event -> player.sendMessage("§c目前沒有任何已紀錄物品。")
+                event -> player.sendMessage(text.emptyMessage())
         ));
     }
 

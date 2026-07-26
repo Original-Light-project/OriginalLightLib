@@ -72,7 +72,9 @@ public class GuiListener implements Listener {
             return;
         }
 
-        if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
+        ClickType click = event.getClick();
+        if (click != ClickType.LEFT && click != ClickType.RIGHT
+                && click != ClickType.SHIFT_LEFT && click != ClickType.SHIFT_RIGHT) {
             return;
         }
 

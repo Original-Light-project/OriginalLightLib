@@ -40,6 +40,14 @@ public class MythicMobsProvider implements ol.originallightlib.integration.mythi
     }
 
     @Override
+    public Optional<String> resolveMobId(Entity entity) {
+        if (!isAvailable() || entity == null) {
+            return Optional.empty();
+        }
+        return MythicBukkit.inst().getMobManager().getMythicType(entity);
+    }
+
+    @Override
     public MythicResult spawnMob(String mobId, Location location, int amount, double level) {
         if (!isAvailable()) {
             return MythicResult.failure("MythicMobs is not available.");
